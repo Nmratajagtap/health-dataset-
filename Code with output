@@ -1,0 +1,140 @@
+import pandas as pd
+import xlrd
+df = pd.read_csv(r"C:\Users\Admin\Downloads\NFHS_5_Factsheets_Data.csv")
+df.head()
+                  States/UTs  ... Unnamed: 136
+0                      India  ...          NaN
+1                      India  ...          NaN
+2                      India  ...          NaN
+3  Andaman & Nicobar Islands  ...          NaN
+4  Andaman & Nicobar Islands  ...          NaN
+
+[5 rows x 137 columns]
+df.nunique()
+States/UTs                                                       37
+Area                                                              3
+Number of Households surveyed                                   111
+Number of Women age 15-49 years interviewed                     110
+Number of Men age 15-54 years interviewed                       110
+                                                               ... 
+Women age 15 years and above who use any kind of tobacco (%)     91
+Men age 15 years and above who use any kind of tobacco (%)      100
+Women age 15 years and above who consume alcohol (%)             43
+Men age 15 years and above who consume alcohol (%)              104
+Unnamed: 136                                                      0
+Length: 137, dtype: int64
+df.isnull().sum()
+States/UTs                                                        0
+Area                                                              0
+Number of Households surveyed                                     0
+Number of Women age 15-49 years interviewed                       0
+Number of Men age 15-54 years interviewed                         0
+                                                               ... 
+Women age 15 years and above who use any kind of tobacco (%)      0
+Men age 15 years and above who use any kind of tobacco (%)        0
+Women age 15 years and above who consume alcohol (%)              0
+Men age 15 years and above who consume alcohol (%)                0
+Unnamed: 136                                                    111
+Length: 137, dtype: int64
+df.shape
+(111, 137)
+# Step 1 – Inspect
+
+# Step 2 – Clean column names
+
+df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
+# Step 4 – Remove duplicates
+
+df.drop_duplicates(inplace=True)
+
+# Step 5 – Convert percentage strings to numbers (if any)
+
+for col in df.columns:
+    if df[col].dtype == 'object' and df[col].astype(str).str.contains('%').any():
+        df[col] = df[col].astype(str).str.replace('%', '', regex=False)
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        
+# Step 6 – Normalize numeric values
+
+numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+
+numeric_cols
+Index(['number_of_households_surveyed',
+       'number_of_women_age_15-49_years_interviewed',
+       'number_of_men_age_15-54_years_interviewed',
+       'population_below_age_15_years_(%)',
+       'sex_ratio_of_the_total_population_(females_per_1,000_males)',
+       'population_living_in_households_with_electricity_(%)',
+       'population_living_in_households_with_an_improved_drinking-water_source1_(%)',
+       'population_living_in_households_that_use_an_improved_sanitation_facility2_(%)',
+       'adolescent_fertility_rate_for_women_age_15-19_years5', 'unnamed:_136'],
+      dtype='object')
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler
+
+
+output_path = r"C:\Users\Admin\Documents\nfhs5_cleaned.csv"
+
+df = pd.read_excel(r"C:\Users\Admin\Downloads\NFHS_5_Factsheets_Data.xls")
+
+scaler = StandardScaler()
+
+scaler
+StandardScaler()
+
+
+output_path = r"C:\Users\Admin\Documents\nfhs5_cleaned.csv"
+
+df = pd.read_excel(r"C:\Users\Admin\Downloads\NFHS_5_Factsheets_Data.xls")
+
+Step 1 – Define Chatbot Use Case
+We decide what the chatbot will do with this dataset.
+Example:
+
+Answer questions like “What is the percentage of households with improved sanitation in Maharashtra?”
+
+Compare health indicators between states.
+
+Provide statistical facts from NFHS-5 for policy analysis.
+
+Step 2 – Structure Data for Q&A Format
+Chatbots usually need the data in a knowledge base format, like:
+
+question	answer
+What is the percentage of households with improved sanitation in Maharashtra?	72.5%
+What is the child immunization rate in Kerala?	94.3%
+
+We’ll create such a format from the cleaned dataset.
+
+Step 3 – Tokenization & Text Cleaning
+Remove special characters, extra spaces, and ensure consistent naming for states/UTs.
+
+Convert all text to lowercase for easier matching.
+
+Use abbreviations only when defined.
+
+Step 4 – Store in Searchable Format
+For chatbot training, we can:
+
+Save as CSV/JSON for use with RAG (Retrieval Augmented Generation).
+
+Push into a vector database (like Pinecone, FAISS, Weaviate) for semantic search.
+
+Use embeddings from OpenAI, BERT, etc.
+
+Step 5 – Ethical Considerations
+Privacy: Ensure no personally identifiable information (PII) is included (NFHS-5 is aggregate data, so safe).
+
+Bias awareness: Data may be influenced by sampling or reporting biases; chatbot responses should note limitations.
+
+Cultural sensitivity: Health indicators may be sensitive; ensure language is non-stigmatizing.
+
+Step 6 – Bias Mitigation
+Cross-check values with official NFHS reports to avoid factual errors.
+
+Train the chatbot to acknowledge uncertainty when data is unavailable.
+
+Include explanations for each statistic (source: NFHS-5).
+
